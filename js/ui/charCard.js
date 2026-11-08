@@ -141,9 +141,13 @@
 
     var structure = deco.idc && deco.idc.structure;
     if (!structure) {
-      if (findEnclosure(roots) >= 0) structure = "杂合";
+      var outer = findEnclosure(roots);
+      /* “说”这类字含口，但口只是右部构件，不能因此判成包围结构。
+         只有首字根是包围件时才优先按包围处理。 */
+      if (outer === 0) structure = "杂合";
       else if (LEFT_RADICAL[roots[0][0]]) structure = "左右";
       else if (TOP_RADICAL[roots[0][0]]) structure = "上下";
+      else if (outer >= 0) structure = "杂合";
       else return null;
     }
 
@@ -206,7 +210,110 @@
     return null;
   }
 
+
+  function pathBox(d) {
+    var nums = String(d).match(/-?\d+(?:\.\d+)?/g) || [];
+    if (nums.length < 2) return null;
+    var x1 = Infinity, y1 = Infinity, x2 = -Infinity, y2 = -Infinity;
+    for (var i = 0; i + 1 < nums.length; i += 2) {
+      var x = parseFloat(nums[i]);
+      var y = parseFloat(nums[i + 1]);
+      if (x < x1) x1 = x;
+      if (x > x2) x2 = x;
+      if (y < y1) y1 = y;
+      if (y > y2) y2 = y;
+    }
+    return { x: x1, y: y1, x2: x2, y2: y2 };
+  }
+
+  function boxOverlap(a, b) {
+    var w = Math.min(a.x2, b.x + b.w) - Math.max(a.x, b.x);
+    var h = Math.min(a.y2, b.y + b.h) - Math.max(a.y, b.y);
+    return w > 0 && h > 0 ? w * h : 0;
+  }
+
+  function regionOverlap(bb, r) {
+    if (!r.ring) return boxOverlap(bb, r);
+    var outer = boxOverlap(bb, r);
+    if (!outer) return 0;
+    var inset = r.inset || 0;
+    var inner = {
+      x: r.x + r.w * inset, y: r.y + r.h * inset,
+      w: r.w * (1 - inset * 2), h: r.h * (1 - inset * 2)
+    };
+    var innerHit = boxOverlap(bb, inner);
+    /* 字根笔画从内区起笔时，不要因为外框的 bbox 而抢到包围字根。 */
+    var cx = (bb.x + bb.x2) / 2, cy = (bb.y + bb.y2) / 2;
+    if (cx > inner.x && cx < inner.x + inner.w && cy > inner.y && cy < inner.y + inner.h) {
+      return Math.max(0, innerHit - inner.w * inner.h * 0.35);
+    }
+    return Math.max(0, outer - innerHit * 0.9);
+  }
+
+  /* 有 hanzi-writer 笔画数据时，按“整笔”上色：笔画不被边界切断。
+     笔画坐标是 1024²，必须先把所有笔画的联合墨迹盒归一到 100²，
+     再和版面区域比较；否则会像早期版本一样整体偏移。 */
+  function strokeGlyph(text, deco) {
+    var data = window.HANZI_STROKES && window.HANZI_STROKES[text];
+    if (!data || !data.strokes || !data.strokes.length) return null;
+    var boxes = data.strokes.map(pathBox);
+    var pb = null;
+    boxes.forEach(function (b) {
+      if (!b) return;
+      if (!pb) pb = { x: b.x, y: b.y, x2: b.x2, y2: b.y2 };
+      else {
+        pb.x = Math.min(pb.x, b.x); pb.y = Math.min(pb.y, b.y);
+        pb.x2 = Math.max(pb.x2, b.x2); pb.y2 = Math.max(pb.y2, b.y2);
+      }
+    });
+    if (!pb) return null;
+    var w = Math.max(1, pb.x2 - pb.x), h = Math.max(1, pb.y2 - pb.y);
+    var scale = 88 / Math.max(w, h);
+    var tx = 6 + (88 - w * scale) / 2 - pb.x * scale;
+    /* hanzi-writer 的 y 轴向上；SVG 向下，这里翻转一次。 */
+    var ty = 6 + (88 - h * scale) / 2 + pb.y2 * scale;
+
+    var box = { x: 0, y: 0, w: 100, h: 100 };
+    var regions = layoutFor(text, deco, box);
+    if (!regions) return null;
+
+    function mapped(bb) {
+      return {
+        x: bb.x * scale + tx, x2: bb.x2 * scale + tx,
+        y: ty - bb.y2 * scale, y2: ty - bb.y * scale
+      };
+    }
+
+    var svg = svgNode("svg", {
+      class: "char-glyph-svg is-stroke",
+      viewBox: "0 0 100 100",
+      role: "img",
+      "aria-label": "整字按字根分色：" + (deco.roots || []).map(function (r) { return r[0]; }).join("、")
+    });
+    var g = svgNode("g", {
+      transform: "translate(" + tx.toFixed(4) + " " + ty.toFixed(4) + ") scale(" + scale.toFixed(6) + " " + (-scale).toFixed(6) + ")"
+    });
+    data.strokes.forEach(function (d, i) {
+      var bb = boxes[i] ? mapped(boxes[i]) : null;
+      var best = 0, bestScore = -1;
+      if (bb) {
+        regions.forEach(function (r, idx) {
+          var score = regionOverlap(bb, r);
+          if (score > bestScore) { bestScore = score; best = idx; }
+        });
+      }
+      var root = regions[best] ? regions[best].root : 0;
+      var p = svgNode("path", { d: d, class: "glyph-stroke" });
+      p.style.fill = "var(--root-c" + ((root % 4) + 1) + ")";
+      g.appendChild(p);
+    });
+    svg.appendChild(g);
+    return svg;
+  }
+
   function coloredGlyph(text, deco) {
+    var strokeVersion = strokeGlyph(text, deco);
+    if (strokeVersion) return strokeVersion;
     var box = inkBox(text);
     if (!box) return null;
     var regions = layoutFor(text, deco, box);

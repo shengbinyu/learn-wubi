@@ -1229,6 +1229,11 @@
   stroke-width: 0.5;
 }
 
+.char-glyph-svg.is-stroke .glyph-stroke {
+  stroke: none;
+  shape-rendering: geometricPrecision;
+}
+
 .char-card.is-clickable {
   cursor: pointer;
   transition: transform var(--dur-2) var(--ease-out), box-shadow var(--dur-2) var(--ease-out),

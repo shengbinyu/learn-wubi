@@ -40,6 +40,7 @@
 - 生成物：`data/wubi86-chars.js`、`data/wubi86-words.js`、`data/build-report.json`。
 - 不采用 `ChsWubiNew.lex`：它与 86 base 存在全码差异，容易教错。
 - 拆分词库仅用于个人本地学习；若要公开发布，请替换为有明确许可的开源代码表（例如 Rime 五笔 86）。
+- 整字笔画轮廓来自 [`hanzi-writer-data` 2.0.1](https://github.com/chanind/hanzi-writer-data)（Make Me a Hanzi，ARPHICPL），只取 120 个精选拆解字：`data/hanzi-strokes.js`、`data/hanzi/ARPHICPL.txt`；字形版权与许可见该文件。重新抓取（可选）：`python tools/fetch_hanzi_strokes.py`。
 
 重新生成（可选）：
 
@@ -52,8 +53,8 @@ python tools/build_data.py --src "C:\WINDOWS\InputMethod\CHS" --out data
 零构建、零 npm 依赖；脚本按 `index.html` 中的顺序以经典 `<script>` 加载。
 
 ```powershell
-# 数据/引擎/关卡/复习/拆解测试
-node --test --test-isolation=none tests/data.test.js tests/decomp.test.js tests/engine.test.js tests/levels.test.js tests/progress.test.js
+# 数据/引擎/关卡/复习/拆解/笔画测试
+node --test --test-isolation=none tests/data.test.js tests/decomp.test.js tests/engine.test.js tests/levels.test.js tests/progress.test.js tests/stroke.test.js
 ```
 
 测试在受限沙箱里若报 `spawn EPERM`，用上面的 `--test-isolation=none`；普通环境可直接 `node --test tests/`。
@@ -63,12 +64,14 @@ node --test --test-isolation=none tests/data.test.js tests/decomp.test.js tests/
 ```
 index.html            应用外壳与脚本加载顺序
 css/                  设计令牌、基础、组件、屏幕、动效
-data/                 生成的码表（勿手改）
+data/                 生成的码表与笔画轮廓（勿手改）
+data/hanzi/           ARPHICPL 许可文本
 js/core/              dict / levels / progress / engine / audio / util
 js/data/              roots / lessons / decompositions / passages
 js/ui/                各屏幕组件
 js/app.js             启动、hash 路由、demo 状态
 tools/build_data.py   码表解析与校验
+tools/fetch_hanzi_strokes.py  抓取 120 个字的笔顺轮廓
 tests/                node:test
 qa/                   测试报告与本地截图（不入库）
 docs/screenshots/     README 预览图
@@ -83,6 +86,6 @@ docs/screenshots/     README 预览图
 ## 已知限制
 
 - 只做五笔 86；98/新世纪不在本版。
-- 拆解仅覆盖 120 个精选字，其余字提供「逐键字根域」提示，不假装完整拆解；整字分色按结构近似分区，不声称逐笔拆分。
+- 拆解仅覆盖 120 个精选字，其余字提供「逐键字根域」提示，不假装完整拆解；整字分色优先用真实笔顺轮廓按字根分组上色，分组边界仍是近似，极少数结构交错字（如「我/发」）保留墨色。
 - 单机单用户，进度存在浏览器 `localStorage`（键名 `zg.v1`）；换浏览器/清缓存会丢失，可在设置中导出/导入 JSON。
 - 触屏可浏览，但练习按物理键盘设计。
