@@ -1210,6 +1210,25 @@
   text-shadow: 0 0 1px rgba(36, 31, 26, 0.55), 0 0 5px rgba(36, 31, 26, 0.12);
 }
 
+.char-glyph-svg {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.char-glyph-svg .glyph-char {
+  font-family: var(--font-kai);
+  font-weight: 400;
+  letter-spacing: 0;
+  paint-order: stroke fill;
+  stroke: rgba(36, 31, 26, 0.06);
+  stroke-width: 0.5;
+}
+
 .char-card.is-clickable {
   cursor: pointer;
   transition: transform var(--dur-2) var(--ease-out), box-shadow var(--dur-2) var(--ease-out),

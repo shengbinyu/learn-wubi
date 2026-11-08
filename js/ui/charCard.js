@@ -4,6 +4,259 @@
   var U = ZG.Util;
   var UI = ZG.UI;
   var h = U.el;
+  var SVG_NS = "http://www.w3.org/2000/svg";
+
+  function svgNode(tag, attrs) {
+    var node = document.createElementNS(SVG_NS, tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) { node.setAttribute(k, attrs[k]); });
+    return node;
+  }
+
+  function rect(x, y, w, height, root, late) {
+    return { x: x, y: y, w: w, h: height, root: root, late: !!late };
+  }
+
+  function frac(box, fx, fy, fw, fh, root, late) {
+    return rect(box.x + box.w * fx, box.y + box.h * fy, box.w * fw, box.h * fh, root, late);
+  }
+
+  function ring(root, box, inset) {
+    return { ring: true, root: root, x: box.x, y: box.y, w: box.w, h: box.h, inset: inset === undefined ? 0.12 : inset };
+  }
+
+  var inkCache = {};
+  function inkBox(text) {
+    if (inkCache[text]) return inkCache[text];
+    try {
+      var canvas = document.createElement("canvas");
+      canvas.width = 100;
+      canvas.height = 100;
+      var ctx = canvas.getContext("2d", { willReadFrequently: true });
+      var family = getComputedStyle(document.documentElement).getPropertyValue("--font-kai").trim() || "STKaiti, KaiTi, serif";
+      ctx.clearRect(0, 0, 100, 100);
+      ctx.font = "74px " + family;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "#000";
+      ctx.fillText(text, 50, 50);
+      var data = ctx.getImageData(0, 0, 100, 100).data;
+      var minX = 100, minY = 100, maxX = -1, maxY = -1;
+      for (var y = 0; y < 100; y++) {
+        for (var x = 0; x < 100; x++) {
+          if (data[(y * 100 + x) * 4 + 3] > 18) {
+            if (x < minX) minX = x;
+            if (y < minY) minY = y;
+            if (x > maxX) maxX = x;
+            if (y > maxY) maxY = y;
+          }
+        }
+      }
+      if (maxX < minX || maxY < minY) return null;
+      var box = { x: minX, y: minY, w: maxX - minX + 1, h: maxY - minY + 1 };
+      inkCache[text] = box;
+      return box;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /* 整字分色：同一个字模裁成若干结构区，每区仍显示原字的笔画。
+     不是逐笔画分割，而是按左右/上下/包围的字形骨架近似。 */
+  var ENCLOSING = {
+    "囗": 1, "口": 1, "门": 1, "冂": 1, "匚": 1, "勹": 1, "几": 1,
+    "辶": 1, "广": 1, "疒": 1, "尸": 1, "弋": 1, "戈": 1, "气": 1
+  };
+  var LEFT_RADICAL = {
+    "讠": 1, "亻": 1, "氵": 1, "扌": 1, "纟": 1, "木": 1, "王": 1, "日": 1,
+    "月": 1, "女": 1, "口": 1, "土": 1, "石": 1, "车": 1, "钅": 1, "贝": 1,
+    "马": 1, "鱼": 1, "鸟": 1, "虫": 1, "礻": 1, "衤": 1, "言": 1, "金": 1,
+    "食": 1, "饣": 1, "目": 1, "田": 1, "山": 1, "弓": 1, "子": 1, "耳": 1,
+    "足": 1, "身": 1, "酉": 1, "里": 1, "黑": 1, "鼓": 1
+  };
+  var TOP_RADICAL = { "宀": 1, "艹": 1, "竹": 1, "⺮": 1, "雨": 1, "穴": 1, "冖": 1, "⺌": 1, "广": 1, "疒": 1, "尸": 1, "气": 1 };
+
+  function findEnclosure(roots) {
+    for (var i = 0; i < roots.length; i++) {
+      if (ENCLOSING[roots[i][0]]) return i;
+    }
+    return -1;
+  }
+
+  function specialLayout(text, roots, n, box) {
+    switch (text) {
+      case "想": /* 木/目 在上，心在下 */
+        return [frac(box, 0, 0, 0.5, 0.5, 0), frac(box, 0.5, 0, 0.5, 0.5, 1), frac(box, 0, 0.5, 1, 0.5, 2)];
+      case "花": /* 艹 在上，亻/匕 在下 */
+        return [frac(box, 0, 0, 1, 0.4, 0), frac(box, 0, 0.4, 0.5, 0.6, 1), frac(box, 0.5, 0.4, 0.5, 0.6, 2)];
+      case "动":
+      case "别":
+      case "以": /* 左二右一 */
+        return [frac(box, 0, 0, 0.48, 0.5, 0), frac(box, 0, 0.5, 0.48, 0.5, 1), frac(box, 0.48, 0, 0.52, 1, 2)];
+      case "跑":
+      case "路": /* 左二右二 */
+        return [frac(box, 0, 0, 0.46, 0.5, 0), frac(box, 0, 0.5, 0.46, 0.5, 1),
+          frac(box, 0.46, 0, 0.54, 0.5, 2), frac(box, 0.46, 0.5, 0.54, 0.5, 3)];
+      case "国": /* 囗 外框；王 在内；丶 在右下 */
+        return [ring(0, box, 0.18), frac(box, 0.18, 0.18, 0.64, 0.64, 1),
+          frac(box, 0.70, 0.66, 0.18, 0.18, 2, true)];
+      case "主": /* 丶 在上；王 在下 */
+        return [frac(box, 0, 0, 1, 1, 1), frac(box, 0.42, 0.02, 0.16, 0.16, 0, true)];
+      case "术": /* 木 为主；丶 在右下 */
+        return [frac(box, 0, 0, 1, 1, 0), frac(box, 0.62, 0.62, 0.16, 0.16, 1, true)];
+      case "为": /* 两丶一力 */
+        return [frac(box, 0, 0, 1, 1, 1), frac(box, 0.16, 0.04, 0.14, 0.14, 0, true),
+          frac(box, 0.70, 0.70, 0.14, 0.14, 2, true)];
+      case "笔": /* 竹 在上，毛 在下三叠 */
+        return [frac(box, 0, 0, 1, 0.42, 0), frac(box, 0, 0.42, 1, 0.193, 1),
+          frac(box, 0, 0.613, 1, 0.193, 2), frac(box, 0, 0.806, 1, 0.194, 3)];
+      default:
+        return null;
+    }
+  }
+
+  /* 左偏旁的实际宽度差别很大：讠/亻/氵很窄，日/月/女王接近一半。
+     用固定 38% 会把“说”的丷左点切进左区，因此按首字根给一个近似宽度。 */
+  var LEFT_WIDTH = {
+    "讠": 0.28, "亻": 0.28, "氵": 0.30, "扌": 0.32, "纟": 0.30, "忄": 0.30,
+    "土": 0.32, "王": 0.34, "木": 0.38, "日": 0.46, "月": 0.46, "口": 0.36,
+    "女": 0.46, "石": 0.40, "车": 0.40, "钅": 0.32, "贝": 0.38, "马": 0.38,
+    "鱼": 0.40, "鸟": 0.42, "虫": 0.38, "礻": 0.32, "衤": 0.34, "言": 0.40,
+    "金": 0.40, "禾": 0.40, "白": 0.42, "田": 0.44, "目": 0.42, "山": 0.36,
+    "火": 0.36, "立": 0.34, "足": 0.38, "走": 0.38, "弓": 0.34, "子": 0.34
+  };
+
+  function leftRatio(glyph, n) {
+    if (LEFT_WIDTH[glyph]) return LEFT_WIDTH[glyph];
+    return n >= 3 ? 0.38 : 0.5;
+  }
+
+  function layoutFor(text, deco, box) {
+    var roots = deco.roots || [];
+    var n = roots.length;
+    if (!n) return null;
+    if (n === 1) return [frac(box, 0, 0, 1, 1, 0)];
+
+    var special = specialLayout(text, roots, n, box);
+    if (special) return special;
+
+    var structure = deco.idc && deco.idc.structure;
+    if (!structure) {
+      if (findEnclosure(roots) >= 0) structure = "杂合";
+      else if (LEFT_RADICAL[roots[0][0]]) structure = "左右";
+      else if (TOP_RADICAL[roots[0][0]]) structure = "上下";
+      else return null;
+    }
+
+    var out = [];
+    var i;
+    if (structure === "左右") {
+      var left = leftRatio(roots[0][0], n);
+      var right = 1 - left;
+      if (n === 2) {
+        out.push(frac(box, 0, 0, left, 1, 0), frac(box, left, 0, right, 1, 1));
+      } else if (n === 3) {
+        out.push(frac(box, 0, 0, left, 1, 0), frac(box, left, 0, right, 0.5, 1), frac(box, left, 0.5, right, 0.5, 2));
+      } else {
+        out.push(frac(box, 0, 0, left, 1, 0));
+        for (i = 1; i < n; i++) out.push(frac(box, left, (i - 1) / (n - 1), right, 1 / (n - 1), i));
+      }
+      return out;
+    }
+
+    if (structure === "上下") {
+      if (n === 2) {
+        out.push(frac(box, 0, 0, 1, 0.5, 0), frac(box, 0, 0.5, 1, 0.5, 1));
+      } else {
+        for (i = 0; i < n; i++) out.push(frac(box, 0, i / n, 1, 1 / n, i));
+      }
+      return out;
+    }
+
+    /* 杂合：包围字根只取外缘一圈，内区留空给其余字根。 */
+    var outer = findEnclosure(roots);
+    if (outer >= 0) {
+      /* 口/囗/门/几 这类方框笔画较厚，环要更宽；辶/广/尸 只取一条边，环窄一些。 */
+      var thin = { "辶": 1, "廴": 1, "广": 1, "疒": 1, "尸": 1, "弋": 1, "戈": 1, "气": 1 };
+      var inset = thin[roots[outer][0]] ? 0.10 : 0.18;
+      out.push(ring(outer, box, inset));
+      var rest = [];
+      for (i = 0; i < n; i++) if (i !== outer) rest.push(i);
+      if (rest.length === 1) {
+        out.push(frac(box, inset, inset, 1 - inset * 2, 1 - inset * 2, rest[0]));
+      } else if (rest.length === 2) {
+        out.push(frac(box, inset, inset, 1 - inset * 2, (1 - inset * 2) / 2, rest[0]));
+        out.push(frac(box, inset, 0.5, 1 - inset * 2, (1 - inset * 2) / 2, rest[1]));
+      } else {
+        for (i = 0; i < rest.length; i++) {
+          out.push(frac(box, inset, inset + i * (1 - inset * 2) / rest.length,
+            1 - inset * 2, (1 - inset * 2) / rest.length, rest[i]));
+        }
+      }
+      return out;
+    }
+
+    if (n === 2) {
+      out.push(frac(box, 0, 0, 1, 0.5, 0), frac(box, 0, 0.5, 1, 0.5, 1));
+      return out;
+    }
+    if (n === 3) {
+      for (i = 0; i < 3; i++) out.push(frac(box, 0, i / 3, 1, 1 / 3, i));
+      return out;
+    }
+    return null;
+  }
+
+  function coloredGlyph(text, deco) {
+    var box = inkBox(text);
+    if (!box) return null;
+    var regions = layoutFor(text, deco, box);
+    if (!regions) return null;
+    var uid = U.uid("glyph");
+    var svg = svgNode("svg", {
+      class: "char-glyph-svg",
+      viewBox: "0 0 100 100",
+      role: "img",
+      "aria-label": "整字按字根分色：" + (deco.roots || []).map(function (r) { return r[0]; }).join("、")
+    });
+    var defs = svgNode("defs");
+    var layers = [];
+    regions.forEach(function (r, idx) {
+      var id = uid + "-" + idx;
+      var cp = svgNode("clipPath", { id: id, clipPathUnits: "userSpaceOnUse" });
+      if (r.ring) {
+        var ix = r.x + r.w * r.inset;
+        var iy = r.y + r.h * r.inset;
+        var iw = r.w * (1 - r.inset * 2);
+        var ih = r.h * (1 - r.inset * 2);
+        cp.appendChild(svgNode("path", {
+          d: "M" + r.x + " " + r.y + " H" + (r.x + r.w) + " V" + (r.y + r.h) + " H" + r.x +
+            " Z M" + ix + " " + iy + " V" + (iy + ih) + " H" + (ix + iw) + " V" + iy + " Z",
+          "clip-rule": "evenodd"
+        }));
+      } else {
+        cp.appendChild(svgNode("rect", {
+          x: r.x, y: r.y, width: r.w, height: r.h
+        }));
+      }
+      defs.appendChild(cp);
+      layers.push({ region: r, clip: id });
+    });
+    svg.appendChild(defs);
+    var ordered = layers.filter(function (l) { return !l.region.late; })
+      .concat(layers.filter(function (l) { return l.region.late; }));
+    ordered.forEach(function (layer) {
+      var g = svgNode("g", { "clip-path": "url(#" + layer.clip + ")" });
+      var t = svgNode("text", {
+        x: 50, y: 50, "text-anchor": "middle", "dominant-baseline": "central",
+        "font-size": 74, class: "glyph-char"
+      });
+      t.style.fill = "var(--root-c" + ((layer.region.root % 4) + 1) + ")";
+      t.textContent = text;
+      g.appendChild(t);
+      svg.appendChild(g);
+    });
+    return svg;
+  }
 
   function charCard(text, opts) {
     opts = opts || {};
@@ -12,14 +265,15 @@
     if (opts.mastery !== undefined) {
       box = h("span", { class: "char-mastery" }, "盒 " + opts.mastery);
     }
+    var deco = window.ZG_DECOMPOSITIONS && ZG_DECOMPOSITIONS[text];
+    var glyph = (!opts.compact && deco) ? coloredGlyph(text, deco) : null;
+    if (!glyph) glyph = h("span", { class: "char-glyph" }, text);
     var node = h("div", {
       class: "char-card" + (opts.compact ? " char-card-compact" : "") + (opts.clickable ? " is-clickable" : ""),
       role: opts.clickable ? "button" : null,
       tabindex: opts.clickable ? "0" : null
     },
-      h("div", { class: "char-grid" },
-        h("span", { class: "char-glyph" }, text)
-      ),
+      h("div", { class: "char-grid" }, glyph),
       h("div", { class: "char-meta" },
         h("span", { class: "char-text" }, text),
         codes && codes.length ? UI.codeChips(codes, { target: opts.target, text: text }) : h("span", { class: "muted" }, "词库未收录"),
