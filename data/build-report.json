@@ -1,0 +1,170 @@
+{
+  "scheme": "wubi86",
+  "source": "ChsWubi.lex",
+  "sourceBytes": 1808326,
+  "sourceSha256": "2a6070610897699d627e0c9c624483d250da8f897ec420063fae2f92b1625d24",
+  "records": 87514,
+  "chars": 6890,
+  "words": 76378,
+  "builtAt": "2026-11-06T23:18:50+08:00",
+  "path": "C:\\WINDOWS\\InputMethod\\CHS\\ChsWubi.lex",
+  "codeLenDist": {
+    "1": 25,
+    "2": 599,
+    "3": 4411,
+    "4": 6044
+  },
+  "wordLenDist": {
+    "2": 50787,
+    "3": 12946,
+    "4": 11607,
+    "5": 705,
+    "6": 242,
+    "7": 121,
+    "8": 19,
+    "9": 8
+  },
+  "minLenDist": {
+    "1": 25,
+    "2": 588,
+    "3": 3826,
+    "4": 2451
+  },
+  "duplicateWordCodeCount": 1,
+  "duplicateWordCodeSamples": [
+    {
+      "word": "汶川",
+      "codes": [
+        "iyhh",
+        "iykt"
+      ]
+    }
+  ],
+  "samples": {
+    "明": [
+      "je",
+      "jeg"
+    ],
+    "好": [
+      "vb",
+      "vbg"
+    ],
+    "只": [
+      "kw",
+      "kwu"
+    ],
+    "国": [
+      "l",
+      "lgy",
+      "lgyi"
+    ],
+    "远": [
+      "fqp",
+      "fqpv"
+    ],
+    "你": [
+      "wq",
+      "wqi",
+      "wqiy"
+    ],
+    "林": [
+      "ss",
+      "ssy"
+    ],
+    "森": [
+      "sss",
+      "sssu"
+    ],
+    "品": [
+      "kkk",
+      "kkkf"
+    ],
+    "工": [
+      "a",
+      "aaa",
+      "aaaa"
+    ],
+    "王": [
+      "ggg",
+      "gggg"
+    ],
+    "这": [
+      "p",
+      "yp",
+      "ypi"
+    ],
+    "的": [
+      "r",
+      "rqy",
+      "rqyy"
+    ],
+    "我": [
+      "q",
+      "trn",
+      "trnt"
+    ],
+    "是": [
+      "j",
+      "jgh",
+      "jghu"
+    ],
+    "中": [
+      "k",
+      "kh",
+      "khk"
+    ],
+    "同": [
+      "m",
+      "mg",
+      "mgk",
+      "mgkd"
+    ],
+    "民": [
+      "n",
+      "na",
+      "nav"
+    ],
+    "发": [
+      "v",
+      "ntc",
+      "ntcy"
+    ],
+    "经": [
+      "x",
+      "xc",
+      "xca",
+      "xcag"
+    ],
+    "亲": [
+      "us",
+      "usu"
+    ]
+  },
+  "wordSamples": {
+    "工作": "aawt",
+    "我们": "trwu",
+    "中国": "khlg",
+    "学习": "ipnu",
+    "五笔": "ggtt",
+    "字根": "pbsv"
+  },
+  "files": {
+    "chars": {
+      "bytes": 127416,
+      "entries": 6890
+    },
+    "words": {
+      "bytes": 1342275,
+      "entries": 76378
+    }
+  },
+  "expected": {
+    "records": 87514,
+    "chars": 6890,
+    "words": 76378,
+    "one": 25,
+    "two": 599,
+    "three": 4411,
+    "four": 6044
+  }
+}

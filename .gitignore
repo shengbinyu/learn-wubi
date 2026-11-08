@@ -1,0 +1,13 @@
+# OS / editor
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.log
+
+# 本地无头浏览器 profile、截图与临时产物
+qa/*
+!qa/QA-REPORT.md
+.preview/
+
+# 本地存档/备份
+*.bak

@@ -1,0 +1,214 @@
+/* ============================================================================
+   字根工坊 · tokens.css
+   活字印刷工坊 —— 纸、墨、朱砂、木、金。
+   本文件只放设计令牌与纹理；所有纹理均为内联 SVG data URI 或 CSS 渐变，
+   不加载任何外部字体、图片或网络资源。
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* ── 纸 ─────────────────────────────────────────────────────────── */
+  --paper-0: #fbf5e7;
+  --paper-1: #f2e8d5;
+  --paper-2: #e6d7bd;
+  --paper-3: #d9c6a4;
+  --paper-4: #c8b28b;
+  --paper-sheet: #f7efdd;
+  --paper-raised: #faf3e4;
+  --paper-deep: #e2d1b2;
+
+  /* ── 墨 ─────────────────────────────────────────────────────────── */
+  --ink: #241f1a;
+  --ink-2: #352e26;
+  --ink-soft: #5a5145;
+  --ink-mute: #6a5f4f;
+  --ink-faint: #8a7d68;
+  --ink-line: rgba(36, 31, 26, 0.14);
+  --ink-line-strong: rgba(36, 31, 26, 0.3);
+  --ink-wash: rgba(36, 31, 26, 0.07);
+
+  /* ── 朱砂 · 印 ───────────────────────────────────────────────────── */
+  --cinnabar: #a83226;
+  --cinnabar-deep: #7f241b;
+  --cinnabar-light: #c0503c;
+  --cinnabar-wash: rgba(168, 50, 38, 0.09);
+  --seal: #b33a2b;
+  --seal-deep: #8c2a20;
+  --seal-light: #c65a45;
+
+  /* ── 木 · 金 ─────────────────────────────────────────────────────── */
+  --wood: #8a5f38;
+  --wood-deep: #6d4728;
+  --wood-dark: #4a2f1a;
+  --wood-darkest: #2a1c10;
+  --wood-light: #c49a68;
+  --wood-pale: #e3cda6;
+  --gold: #b08a4a;
+  --gold-deep: #8a672f;
+  --gold-light: #d9b26a;
+  --gold-pale: #ecd9b0;
+
+  /* ── 匾额（深色木牌） ─────────────────────────────────────────────── */
+  --plaque-1: #33261a;
+  --plaque-2: #241b12;
+  --plaque-3: #1b140d;
+  --plaque-text: #f4ead6;
+  --plaque-mute: rgba(244, 234, 214, 0.64);
+  --plaque-line: rgba(244, 234, 214, 0.16);
+
+  /* ── 五区（低饱和） ───────────────────────────────────────────────── */
+  --zone-heng: #b08a4a;
+  --zone-heng-deep: #7a5a22;
+  --zone-heng-tint: rgba(176, 138, 74, 0.15);
+
+  --zone-shu: #5f7d6b;
+  --zone-shu-deep: #3d5a49;
+  --zone-shu-tint: rgba(95, 125, 107, 0.15);
+
+  --zone-pie: #a8553f;
+  --zone-pie-deep: #7d3526;
+  --zone-pie-tint: rgba(168, 85, 63, 0.14);
+
+  --zone-na: #5b7186;
+  --zone-na-deep: #37536a;
+  --zone-na-tint: rgba(91, 113, 134, 0.14);
+
+  --zone-zhe: #7b6688;
+  --zone-zhe-deep: #554267;
+  --zone-zhe-tint: rgba(123, 102, 136, 0.14);
+
+  --zone-ink-tint: rgba(36, 31, 26, 0.07);
+
+  /* ── 字体 ─────────────────────────────────────────────────────────── */
+  --font-brand: "STXingkai", "华文行楷", "Xingkai SC", "KaiTi", "STKaiti", serif;
+  --font-head: "STKaiti", "KaiTi", "楷体", "Kaiti SC", "STFangsong", "FangSong", serif;
+  --font-kai: "STKaiti", "KaiTi", "楷体", "Kaiti SC", "STFangsong", "FangSong", serif;
+  --font-body: "STFangsong", "FangSong", "仿宋", "FangSong_GB2312", "STSong", "Songti SC", "SimSun", serif;
+  --font-mono: "Consolas", "Cascadia Mono", "Lucida Console", "Courier New", monospace;
+  --font-symbol: "Segoe UI Symbol", "Segoe UI", "PingFang SC", sans-serif;
+
+  /* ── 字号 · 行高 ──────────────────────────────────────────────────── */
+  --fs-3xs: 10px;
+  --fs-2xs: 11px;
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-base: 15.5px;
+  --fs-md: 17px;
+  --fs-lg: 20px;
+  --fs-xl: 24px;
+  --fs-2xl: 30px;
+  --fs-3xl: 38px;
+  --fs-display: 52px;
+
+  --lh-tight: 1.22;
+  --lh-snug: 1.45;
+  --lh-base: 1.72;
+
+  /* ── 间距 ─────────────────────────────────────────────────────────── */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-7: 32px;
+  --sp-8: 40px;
+  --sp-9: 56px;
+
+  /* ── 圆角（活字是方的，圆角克制） ─────────────────────────────────── */
+  --r-1: 2px;
+  --r-2: 3px;
+  --r-3: 4px;
+  --r-4: 6px;
+  --r-round: 999px;
+
+  /* ── 布局 ─────────────────────────────────────────────────────────── */
+  --shell-max: 1720px;
+  --nav-w: 224px;
+  --aside-w: 320px;
+  --shell-gap: 20px;
+  --topbar-h: 72px;
+  --char-size: clamp(112px, 12vw, 164px);
+  --key-max: 68px;
+  --key-min: 32px;
+  --key-h: 60px;
+
+  /* ── 阴影 ─────────────────────────────────────────────────────────── */
+  --shadow-card: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 2px rgba(60, 42, 25, 0.1);
+  --shadow-sheet: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 1px 2px rgba(60, 42, 25, 0.08),
+    0 16px 32px -24px rgba(60, 42, 25, 0.55);
+  --shadow-lift: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 16px 28px -16px rgba(60, 42, 25, 0.42);
+  --shadow-key: inset 0 1px 0 rgba(255, 248, 230, 0.8), inset 0 -2px 0 rgba(122, 84, 48, 0.4),
+    0 2px 0 #6d4728, 0 4px 0 #5c3d24, 0 6px 9px rgba(30, 18, 8, 0.32);
+  --shadow-key-down: inset 0 2px 5px rgba(40, 24, 10, 0.42), inset 0 -1px 0 rgba(255, 248, 230, 0.18),
+    0 1px 0 rgba(0, 0, 0, 0.25);
+  --shadow-seal: inset 0 0 0 1.5px rgba(255, 240, 220, 0.45), inset 0 0 14px rgba(80, 18, 10, 0.4),
+    0 2px 5px rgba(70, 18, 10, 0.35);
+  --shadow-modal: 0 2px 0 rgba(255, 255, 255, 0.5) inset, 0 30px 70px -30px rgba(20, 12, 6, 0.82);
+  --shadow-plaque: 0 2px 0 rgba(0, 0, 0, 0.35), 0 12px 30px -14px rgba(20, 12, 6, 0.65);
+
+  --focus-ring: 0 0 0 2px var(--paper-0), 0 0 0 4px var(--cinnabar);
+  --focus-ring-dark: 0 0 0 2px var(--plaque-2), 0 0 0 4px var(--gold-light);
+
+  /* ── 动效 ─────────────────────────────────────────────────────────── */
+  --dur-1: 150ms;
+  --dur-2: 260ms;
+  --dur-3: 420ms;
+  --dur-4: 560ms;
+  --ease-out: cubic-bezier(0.22, 0.8, 0.26, 1);
+  --ease-in-out: cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  --ease-stamp: cubic-bezier(0.2, 1.35, 0.4, 1);
+  --ease-ink: cubic-bezier(0.16, 0.6, 0.24, 1);
+
+  /* ── 层级 ─────────────────────────────────────────────────────────── */
+  --z-nav: 30;
+  --z-topbar: 40;
+  --z-overlay: 110;
+  --z-toast: 120;
+  --z-boot: 200;
+  --z-skip: 300;
+
+  /* ── 纹理：内联 SVG 噪点（纸张纤维） ──────────────────────────────── */
+  --tex-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.24 0 0 0 0 0.19 0 0 0 0 0.12 0 0 0 0.115 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E");
+
+  /* ── 复合背景（页面 / 纸面 / 木 / 竹） ────────────────────────────── */
+  --bg-paper:
+    var(--tex-grain),
+    repeating-linear-gradient(90deg, rgba(90, 70, 40, 0.018) 0 1px, transparent 1px 4px),
+    radial-gradient(1100px 520px at 50% -8%, rgba(255, 252, 243, 0.75), transparent 72%),
+    radial-gradient(900px 700px at 102% 4%, rgba(122, 92, 54, 0.1), transparent 62%),
+    radial-gradient(760px 640px at -6% 98%, rgba(56, 42, 26, 0.1), transparent 66%),
+    linear-gradient(168deg, #f6eddc 0%, #f0e5d0 46%, #e9dabe 100%);
+
+  --bg-sheet:
+    var(--tex-grain),
+    linear-gradient(160deg, #faf3e4 0%, #f3e8d3 58%, #ecdec4 100%);
+
+  --bg-sheet-warm:
+    var(--tex-grain),
+    linear-gradient(152deg, #f8f0df 0%, #efe2c8 60%, #e7d6b7 100%);
+
+  --bg-plaque:
+    var(--tex-grain),
+    repeating-linear-gradient(90deg, rgba(255, 235, 200, 0.035) 0 1px, transparent 1px 7px,
+      rgba(0, 0, 0, 0.05) 7px 8px, transparent 8px 15px),
+    linear-gradient(180deg, #3a2c1d 0%, #2b2015 48%, #201810 100%);
+
+  --bg-wood:
+    repeating-linear-gradient(92deg, rgba(255, 236, 200, 0.05) 0 1px, transparent 1px 5px,
+      rgba(0, 0, 0, 0.06) 5px 6px, transparent 6px 12px),
+    linear-gradient(180deg, #4c3520 0%, #3a2717 55%, #2e1f12 100%);
+
+  --bg-key:
+    repeating-linear-gradient(93deg, rgba(122, 84, 48, 0.1) 0 1px, transparent 1px 4px),
+    linear-gradient(180deg, #e8d2a8 0%, #d9be8d 45%, #c9a973 100%);
+
+  --bg-bamboo:
+    repeating-linear-gradient(90deg, rgba(120, 84, 44, 0.08) 0 1px, transparent 1px 6px),
+    linear-gradient(180deg, #e6d3ab 0%, #d8c196 55%, #cbb184 100%);
+
+  --bg-brass:
+    linear-gradient(180deg, rgba(242, 232, 213, 0.12), rgba(0, 0, 0, 0.18)),
+    linear-gradient(180deg, #7a5c35 0%, #5e4526 55%, #4a3419 100%);
+}
