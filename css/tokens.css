@@ -80,6 +80,16 @@
 
   --zone-ink-tint: rgba(36, 31, 26, 0.07);
 
+  /* ── 拆解字根顺序色（与五区色分开，保证同一拆解内逐根可辨） ──────── */
+  --root-c1: #a83226;
+  --root-c1-tint: rgba(168, 50, 38, 0.12);
+  --root-c2: #3f5d7a;
+  --root-c2-tint: rgba(63, 93, 122, 0.12);
+  --root-c3: #4f6b4c;
+  --root-c3-tint: rgba(79, 107, 76, 0.13);
+  --root-c4: #8a5a24;
+  --root-c4-tint: rgba(138, 90, 36, 0.13);
+
   /* ── 字体 ─────────────────────────────────────────────────────────── */
   --font-brand: "STXingkai", "华文行楷", "Xingkai SC", "KaiTi", "STKaiti", serif;
   --font-head: "STKaiti", "KaiTi", "楷体", "Kaiti SC", "STFangsong", "FangSong", serif;

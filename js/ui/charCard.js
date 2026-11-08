@@ -73,16 +73,30 @@
     var deco = window.ZG_DECOMPOSITIONS && ZG_DECOMPOSITIONS[text];
     var codes = ZG.Dict.codesOf(text);
     if (deco) {
-      var row = h("div", { class: "decomp-roots" });
-      (deco.roots || []).forEach(function (r) {
+      var row = h("div", { class: "decomp-roots", "aria-label": "拆解字根，按顺序着色" });
+      (deco.roots || []).forEach(function (r, idx) {
         var info = ZG_ROOTS && ZG_ROOTS.byKey ? ZG_ROOTS.byKey[r[1]] : null;
-        row.appendChild(h("span", { class: "decomp-root " + UI.zoneClass(info ? info.zoneName : "") },
-          h("b", {}, r[0]), h("small", {}, r[1].toUpperCase() + (info ? " · " + info.name : ""))
+        var order = idx + 1;
+        var color = ((idx % 4) + 1);
+        var title = "第 " + order + " 个字根：" + r[0] + " · " + String(r[1]).toUpperCase() +
+          (info ? " 键（" + info.name + "）" : "");
+        row.appendChild(h("span", {
+          class: "decomp-root root-c" + color,
+          title: title,
+          "data-root-order": order
+        },
+          h("span", { class: "root-order", "aria-hidden": "true" }, String(order)),
+          h("b", {}, r[0]),
+          h("small", {}, r[1].toUpperCase() + (info ? " · " + info.name : ""))
         ));
       });
       if (deco.idc) {
         var info2 = ZG_ROOTS && ZG_ROOTS.byKey ? ZG_ROOTS.byKey[deco.idc.key] : null;
-        row.appendChild(h("span", { class: "decomp-root decomp-idc " + UI.zoneClass(info2 ? info2.zoneName : "") },
+        row.appendChild(h("span", {
+          class: "decomp-root decomp-idc",
+          title: "识别码：" + deco.idc.key.toUpperCase() +
+            (info2 ? "（" + info2.name + "键）" : "") + " · " + deco.idc.stroke + " · " + deco.idc.structure
+        },
           h("b", {}, "识别码"), h("small", {}, deco.idc.key.toUpperCase() + " · " + deco.idc.stroke + " · " + deco.idc.structure)
         ));
       }
@@ -95,7 +109,7 @@
     code.split("").forEach(function (letter, i) {
       var info = ZG_ROOTS && ZG_ROOTS.byKey ? ZG_ROOTS.byKey[letter] : null;
       if (!info) return;
-      domains.appendChild(h("div", { class: "key-domain " + UI.zoneClass(info.zoneName) },
+      domains.appendChild(h("div", { class: "key-domain root-c" + ((i % 4) + 1) },
         h("span", { class: "domain-key" }, letter.toUpperCase()),
         h("span", { class: "domain-name" }, info.name),
         h("span", { class: "domain-roots" }, (info.roots || []).slice(0, 4).join(" ")),

@@ -1475,17 +1475,19 @@
 }
 
 .decomp-root {
+  --root-c: var(--zone-c, var(--ink-line-strong));
+  --root-tint: var(--zone-tint, rgba(251, 245, 231, 0.6));
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 4px 9px;
-  border: 1px solid var(--zone-c, var(--ink-line-strong));
+  padding: 4px 9px 4px 6px;
+  border: 1px solid var(--root-c);
   border-radius: var(--r-1);
-  background: var(--zone-tint, rgba(251, 245, 231, 0.6));
+  background: var(--root-tint);
 }
 
 .decomp-root b {
-  color: var(--zone-deep, var(--ink));
+  color: var(--root-c);
   font-family: var(--font-head);
   font-size: 20px;
   font-weight: 600;
@@ -1500,9 +1502,47 @@
   white-space: nowrap;
 }
 
+.decomp-root .root-order {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 15px;
+  height: 15px;
+  border: 1px solid var(--root-c);
+  border-radius: 50%;
+  color: var(--root-c);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0.9;
+}
+
 .decomp-root.decomp-idc {
+  --root-c: var(--ink-mute);
+  --root-tint: rgba(36, 31, 26, 0.05);
   border-style: dashed;
-  background: rgba(251, 245, 231, 0.65);
+}
+
+/* 同一拆解里第 1~4 个字根各用一种传统色；与五区色解耦，避免同区字根同色。 */
+.root-c1 {
+  --root-c: var(--root-c1);
+  --root-tint: var(--root-c1-tint);
+}
+
+.root-c2 {
+  --root-c: var(--root-c2);
+  --root-tint: var(--root-c2-tint);
+}
+
+.root-c3 {
+  --root-c: var(--root-c3);
+  --root-tint: var(--root-c3-tint);
+}
+
+.root-c4 {
+  --root-c: var(--root-c4);
+  --root-tint: var(--root-c4-tint);
 }
 
 .decomp-note {
@@ -1532,13 +1572,13 @@
   flex-direction: column;
   gap: 2px;
   padding: 7px 9px;
-  border-top: 3px solid var(--zone-c, var(--ink-line-strong));
+  border-top: 3px solid var(--root-c, var(--zone-c, var(--ink-line-strong)));
   border-radius: 0 0 var(--r-1) var(--r-1);
   background: rgba(251, 245, 231, 0.55);
 }
 
 .domain-key {
-  color: var(--zone-deep, var(--ink));
+  color: var(--root-c, var(--zone-deep, var(--ink)));
   font-family: var(--font-mono);
   font-size: 17px;
   font-weight: 700;
